@@ -70,6 +70,22 @@ class Inventory:
     def total_value(self) -> float:
         return sum(p.price * p.quantity for p in self._products.values())
 
+    def generate_report(self) -> str:
+        """Render the inventory as an HTML report using report.html as the template structure."""
+        rows = "".join(
+            f"<tr>"
+            f"<td>{p.sku}</td><td>{p.name}</td>"
+            f"<td>${p.price:.2f}</td><td>{p.quantity}</td>"
+            f"<td>{'&#9888; Low' if p.quantity <= self.LOW_STOCK_THRESHOLD else 'OK'}</td>"
+            f"</tr>"
+            for p in self._products.values()
+        )
+        return (
+            f"<table><thead>"
+            f"<tr><th>SKU</th><th>Name</th><th>Price</th><th>Qty</th><th>Status</th></tr>"
+            f"</thead><tbody>{rows}</tbody></table>"
+        )
+
     def _get_or_raise(self, sku: str) -> Product:
         product = self._products.get(sku)
         if product is None:

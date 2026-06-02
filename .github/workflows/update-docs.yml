@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   
 
     steps:
       - name: Checkout repo
@@ -21,15 +23,16 @@ jobs:
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
 
-          # Handle first-ever push (no previous commit)
           if git cat-file -e "$BEFORE" 2>/dev/null; then
             git diff "$BEFORE" "$AFTER" -- '*.py' '*.js' '*.ts' > changes.diff
           else
+            # First-ever push — show all files added in this commit
             git show "$AFTER" -- '*.py' '*.js' '*.ts' > changes.diff
           fi
 
-          LINES=$(wc -l < changes.diff)
-          echo "Diff: $LINES lines"
+          echo "Diff size: $(wc -l < changes.diff) lines"
+          echo "--- diff preview (first 20 lines) ---"
+          head -20 changes.diff || true
 
       - name: Run AI doc updater
         run: python3 .github/scripts/update_docs.py
@@ -50,9 +53,14 @@ jobs:
 
       - name: Sync docs to GitHub Wiki
         run: |
-          git clone \
-            https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git \
-            wiki
+          WIKI_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git"
+
+          if ! git clone "$WIKI_URL" wiki 2>/dev/null; then
+            echo "::warning::Wiki not initialised — skipping sync."
+            echo "To enable wiki sync: go to the Wiki tab on GitHub and create the first page."
+            exit 0
+          fi
+
           cp docs/*.md wiki/
           cd wiki
           git config user.name "github-actions[bot]"

@@ -10,7 +10,7 @@ jobs:
     permissions:
       contents: write
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout repo
@@ -18,26 +18,32 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Build diff (source files only)
+      - name: Build diffs
         run: |
           BEFORE="${{ github.event.before }}"
           AFTER="${{ github.sha }}"
 
           if git cat-file -e "$BEFORE" 2>/dev/null; then
+            # Normal push — diff against previous commit
             git diff "$BEFORE" "$AFTER" -- '*.py' '*.js' '*.ts' > changes.diff
+            git diff "$BEFORE" "$AFTER" -- 'docs/*.md' > docs_manual_changes.diff
           else
-            # First-ever push — show all files added in this commit
+            # First-ever push to this repo
             git show "$AFTER" -- '*.py' '*.js' '*.ts' > changes.diff
+            git show "$AFTER" -- 'docs/*.md' > docs_manual_changes.diff
           fi
 
-          echo "Diff size: $(wc -l < changes.diff) lines"
-          echo "--- diff preview (first 20 lines) ---"
+          echo "Code diff:       $(wc -l < changes.diff) lines"
+          echo "Manual doc diff: $(wc -l < docs_manual_changes.diff) lines"
+          echo "Triggered by:    ${{ github.actor }}"
+          echo "--- code diff preview (first 20 lines) ---"
           head -20 changes.diff || true
 
       - name: Run AI doc updater
         run: python3 .github/scripts/update_docs.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
 
       - name: Commit updated docs (if anything changed)
         run: |
@@ -48,6 +54,8 @@ jobs:
             echo "No doc changes to commit."
           else
             git commit -m "docs: auto-update from AI [skip ci]"
+            # Another push may have landed while this workflow was running — rebase before pushing
+            git pull --rebase origin main
             git push
           fi
 
@@ -57,13 +65,22 @@ jobs:
 
           if ! git clone "$WIKI_URL" wiki 2>/dev/null; then
             echo "::warning::Wiki not initialised — skipping sync."
-            echo "To enable wiki sync: go to the Wiki tab on GitHub and create the first page."
+            echo "To enable: go to the Wiki tab and create the first page."
             exit 0
+          fi
+
+          # Detect human wiki edits (last commit not from the bot)
+          LAST_WIKI_AUTHOR=$(cd wiki && git log -1 --format='%an')
+          LAST_WIKI_SUBJECT=$(cd wiki && git log -1 --format='%s')
+          if [ "$LAST_WIKI_AUTHOR" != "github-actions[bot]" ]; then
+            echo "::warning::Wiki was manually edited by '$LAST_WIKI_AUTHOR' (\"$LAST_WIKI_SUBJECT\")."
+            echo "::warning::Wiki is a read-only mirror — edit docs/*.md in the repo instead."
+            echo "::warning::The manual wiki edit will be overwritten by this sync."
           fi
 
           cp docs/*.md wiki/
 
-          # Write custom sidebar — controls page order in the wiki navigation
+          # Write custom sidebar — defines page order in wiki navigation
           printf '## Documentation\n\n- [Home](Home)\n- [Overview](overview)\n- [API Reference](api-reference)\n- [Changelog](changelog)\n' > wiki/_Sidebar.md
 
           cd wiki
@@ -73,6 +90,11 @@ jobs:
           if git diff --staged --quiet; then
             echo "Wiki already up to date."
           else
-            git commit -m "docs: sync from main [skip ci]"
-            git push
+            git commit -m "docs: sync from @${{ github.actor }} [skip ci]"
+            # Wiki is a read-only mirror — force-with-lease overwrites any UI edits
+            # but only if nobody pushed to the wiki AFTER we cloned (avoids silent clobber)
+            if ! git push --force-with-lease; then
+              echo "::warning::Wiki was updated after this workflow cloned it."
+              echo "::warning::Re-trigger the workflow (empty commit or re-push) to sync again."
+            fi
           fi

@@ -1,21 +1,26 @@
 """
 AI Documentation Updater
 Reads the git diff, calls GitHub Models, and writes updated /docs files.
+Attributes changelog entries to the GitHub actor who triggered the push.
+Preserves any manual doc edits that arrived in the same commit.
 """
 
 import json
 import os
+import subprocess
 import sys
 import urllib.error
 import urllib.request
 
 DOCS_DIR = "docs"
 DIFF_FILE = "changes.diff"
+MANUAL_DOCS_DIFF_FILE = "docs_manual_changes.diff"
 MODEL_URL = "https://models.inference.ai.azure.com/chat/completions"
+# Switch to "gpt-5-mini" once Copilot Pro is active (12 req/day limit applies).
 MODEL_ID = "gpt-4o-mini"
-DOC_FILES = ["overview.md", "api-reference.md", "changelog.md"]
-MAX_DIFF_CHARS = 3000   # keep total prompt well under 4000-token limit
-MAX_DOC_CHARS = 1500    # per doc file — prevents oversized prompts as docs grow
+DOC_FILES = ["Home.md", "overview.md", "api-reference.md", "changelog.md"]
+MAX_DIFF_CHARS = 3000
+MAX_DOC_CHARS = 1500
 
 
 def read_file(path: str) -> str:
@@ -23,27 +28,72 @@ def read_file(path: str) -> str:
         return f.read()
 
 
+def read_file_safe(path: str) -> str:
+    """Return file content, or empty string if file doesn't exist."""
+    try:
+        return read_file(path)
+    except FileNotFoundError:
+        return ""
+
+
 def write_file(path: str, content: str) -> None:
     with open(path, "w") as f:
         f.write(content)
 
 
-def build_prompt(diff: str, docs: dict) -> str:
+def get_git_info() -> tuple[str, str]:
+    """Return (author_display_name, commit_subject) from the latest git commit."""
+    try:
+        name = subprocess.check_output(
+            ["git", "log", "-1", "--format=%an"], text=True
+        ).strip()
+        subject = subprocess.check_output(
+            ["git", "log", "-1", "--format=%s"], text=True
+        ).strip()
+        return name, subject
+    except subprocess.SubprocessError:
+        return "unknown", ""
+
+
+def build_prompt(
+    diff: str,
+    docs: dict,
+    manual_doc_changes: str,
+    actor: str,
+    author_name: str,
+    commit_subject: str,
+) -> str:
     docs_block = "\n\n".join(
         f"### {name}\n{content[:MAX_DOC_CHARS]}" for name, content in docs.items()
     )
+
+    attribution = f"@{actor} ({author_name})"
+    commit_line = f" Commit message: \"{commit_subject}\"." if commit_subject else ""
+
+    manual_section = ""
+    if manual_doc_changes.strip():
+        manual_section = (
+            f"\n\n---\n"
+            f"IMPORTANT: {attribution} also manually edited documentation files in this same push."
+            f" Their manual edits are shown below in diff format."
+            f" You MUST preserve and incorporate these changes — do NOT revert or ignore them:\n"
+            f"```diff\n{manual_doc_changes[:2000]}\n```"
+        )
+
     return (
-        "A developer pushed code changes to a Python project.\n"
-        "Update the documentation so it accurately reflects the new code.\n\n"
-        f"Git diff (capped at {MAX_DIFF_CHARS} chars):\n"
-        f"```diff\n{diff[:MAX_DIFF_CHARS]}\n```\n\n"
+        f"{attribution} pushed a change to the codebase.{commit_line}"
+        f" Update the documentation to reflect the code changes.\n\n"
+        f"Code diff:\n```diff\n{diff[:MAX_DIFF_CHARS]}\n```"
+        f"{manual_section}\n\n"
         "Current documentation:\n"
         f"{docs_block}\n\n"
         "Rules:\n"
         "- Return a JSON object where keys are filenames and values are full updated markdown.\n"
         "- Only include files that actually need changes — omit unchanged files.\n"
-        "- For changelog.md: add a new dated entry at the top of [Unreleased] summarising what changed.\n"
+        f"- For changelog.md: add a new entry under [Unreleased] in this exact format:\n"
+        f"  '- **{attribution}**: <one-line summary of what changed>'\n"
         "- For api-reference.md: reflect any added, removed, or renamed functions/classes/methods.\n"
+        "- PRESERVE any manually written content — do not remove or revert human edits.\n"
         "- Keep the existing markdown structure and style.\n"
         "- Return ONLY valid JSON. No preamble, no code fences around the JSON."
     )
@@ -93,15 +143,22 @@ def main() -> None:
         print("ERROR: GITHUB_TOKEN not set", file=sys.stderr)
         sys.exit(1)
 
+    actor = os.environ.get("GITHUB_ACTOR", "unknown")
+    author_name, commit_subject = get_git_info()
+
     diff = read_file(DIFF_FILE).strip()
     if not diff:
-        print("No diff in changes.diff — nothing to update.")
+        print("No code diff — nothing to update.")
         return
 
-    print(f"Diff size: {len(diff)} chars")
+    manual_doc_changes = read_file_safe(MANUAL_DOCS_DIFF_FILE).strip()
+    if manual_doc_changes:
+        print(f"Manual doc changes detected ({len(manual_doc_changes)} chars) — will preserve them.")
 
-    docs = {f: read_file(f"{DOCS_DIR}/{f}") for f in DOC_FILES}
-    prompt = build_prompt(diff, docs)
+    print(f"Code diff: {len(diff)} chars | Actor: @{actor} ({author_name})")
+
+    docs = {f: read_file_safe(f"{DOCS_DIR}/{f}") for f in DOC_FILES}
+    prompt = build_prompt(diff, docs, manual_doc_changes, actor, author_name, commit_subject)
 
     print(f"Calling {MODEL_ID}...")
     updates = call_model(token, prompt)

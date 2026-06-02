@@ -1,6 +1,7 @@
 # Changelog
 
 ## [Unreleased]
+- **@WeOnlyLiveOnce13 (DanTshisungu)**: feat: add inventory report HTML template and generate_report() method
 
 ## [0.2.0] — Source code upgrade
 - Replaced function-based `calculator.py` with stateful `Calculator` class

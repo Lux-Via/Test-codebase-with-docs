@@ -3,7 +3,6 @@
 ## calculator.py
 
 ### `OperationResult`
-
 A dataclass returned by every calculation, stored in history.
 
 | Field | Type | Description |
@@ -14,7 +13,6 @@ A dataclass returned by every calculation, stored in history.
 | `result` | float | Computed result |
 
 ### `Calculator`
-
 Stateful calculator that records every operation.
 
 | Method | Parameters | Returns | Notes |
@@ -54,12 +52,8 @@ In-memory product store.
 
 | Method | Parameters | Returns | Notes |
 |---|---|---|---|
-| `add_product(sku, name, price, quantity)` | str, str, float, int | Product | raises `ValueError` if SKU exists |
-| `restock(sku, amount)` | str, int | Product | raises `ValueError` if amount ≤ 0 |
-| `sell(sku, quantity)` | str, int | Product | raises `ValueError` if insufficient stock |
-| `search(query)` | str | list[Product] | matches SKU or name (case-insensitive) |
-| `low_stock()` | — | list[Product] | products at or below `LOW_STOCK_THRESHOLD` (5) |
-| `all_products()` | — | list[Product] | — |
-| `get(sku)` | str | Product or None | — |
-| `remove_product(sku)` | str | None | raises `KeyError` if SKU not found |
-| `total_value()` | — | float | sum of price × quantity across all products |
+| `generate_report()` | — | str | Renders the inventory as an HTML report using `report.html` as the template structure. |
+
+### report.html
+
+New HTML template for rendering the inventory report. This file includes a table structure for displaying product details such as SKU, name, price, quantity, and status.

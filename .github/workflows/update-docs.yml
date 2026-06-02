@@ -42,7 +42,7 @@ jobs:
       - name: Run AI doc updater
         run: python3 .github/scripts/update_docs.py
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MODELS_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
 
       - name: Commit updated docs (if anything changed)

@@ -24,12 +24,24 @@ jobs:
           AFTER="${{ github.sha }}"
 
           if git cat-file -e "$BEFORE" 2>/dev/null; then
-            # Normal push — diff against previous commit
-            git diff "$BEFORE" "$AFTER" -- '*.py' '*.js' '*.ts' > changes.diff
+            # Normal push — capture ALL source files, excluding generated/config/docs paths
+            git diff "$BEFORE" "$AFTER" \
+              -- '.' \
+              ':!docs/' ':!.github/' \
+              ':!*.md' ':!*.txt' ':!*.rst' \
+              ':!*.lock' ':!*.pyc' ':!*.map' ':!*.min.js' ':!*.min.css' \
+              ':!package-lock.json' ':!yarn.lock' ':!poetry.lock' \
+              > changes.diff
             git diff "$BEFORE" "$AFTER" -- 'docs/*.md' > docs_manual_changes.diff
           else
             # First-ever push to this repo
-            git show "$AFTER" -- '*.py' '*.js' '*.ts' > changes.diff
+            git show "$AFTER" \
+              -- '.' \
+              ':!docs/' ':!.github/' \
+              ':!*.md' ':!*.txt' ':!*.rst' \
+              ':!*.lock' ':!*.pyc' ':!*.map' ':!*.min.js' ':!*.min.css' \
+              ':!package-lock.json' ':!yarn.lock' ':!poetry.lock' \
+              > changes.diff
             git show "$AFTER" -- 'docs/*.md' > docs_manual_changes.diff
           fi
 

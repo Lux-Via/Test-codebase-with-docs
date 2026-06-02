@@ -19,7 +19,7 @@ MODEL_URL = "https://models.inference.ai.azure.com/chat/completions"
 # Switch to "gpt-5-mini" once Copilot Pro is active (12 req/day limit applies).
 MODEL_ID = "gpt-4o-mini"
 DOC_FILES = ["Home.md", "overview.md", "api-reference.md", "changelog.md"]
-MAX_DIFF_CHARS = 3000
+MAX_DIFF_CHARS = 5000   # increased — mixed-type diffs (HTML + CSS + XML) can be larger
 MAX_DOC_CHARS = 1500
 
 
@@ -92,7 +92,14 @@ def build_prompt(
         "- Only include files that actually need changes — omit unchanged files.\n"
         f"- For changelog.md: add a new entry under [Unreleased] in this exact format:\n"
         f"  '- **{attribution}**: <one-line summary of what changed>'\n"
-        "- For api-reference.md: reflect any added, removed, or renamed functions/classes/methods.\n"
+        "- For api-reference.md: document changes across ALL file types:\n"
+        "    Python (.py)          → functions, classes, methods, parameters, return types\n"
+        "    JavaScript/TypeScript → exported functions, classes, interfaces, modules\n"
+        "    HTML (.html)          → new pages, components, form structures, template purpose\n"
+        "    CSS/SCSS (.css/.scss) → new layout classes, design tokens, component styles\n"
+        "    XML (.xml)            → new views, models, configuration sections (e.g. Odoo views)\n"
+        "    SQL (.sql)            → new tables, columns, procedures, views\n"
+        "  Only include what is relevant to a developer using or extending this codebase.\n"
         "- PRESERVE any manually written content — do not remove or revert human edits.\n"
         "- Keep the existing markdown structure and style.\n"
         "- Return ONLY valid JSON. No preamble, no code fences around the JSON."

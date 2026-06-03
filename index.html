@@ -660,6 +660,147 @@
 
     .contact-item-value a:hover { color: var(--teal); }
 
+    /* ── AI ADOPTION SECTION ── */
+    #ai-adoption { background: var(--light); }
+
+    .ai-layers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 64px;
+    }
+
+    .ai-layer-card {
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .ai-layer-num {
+      background: var(--slate);
+      padding: 10px 16px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--teal);
+    }
+
+    .ai-layer-body {
+      background: var(--white);
+      border-left: 4px solid var(--teal);
+      padding: 18px 20px;
+    }
+
+    .ai-layer-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--slate);
+      margin-bottom: 8px;
+    }
+
+    .ai-layer-desc {
+      font-size: 13px;
+      color: var(--body);
+      line-height: 1.65;
+    }
+
+    .ai-layer-tags {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .ai-tag {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--slate);
+      color: var(--teal);
+      padding: 2px 8px;
+      border-radius: 2px;
+    }
+
+    .ai-tiers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .ai-tier-card {
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .ai-tier-head {
+      background: var(--slate);
+      padding: 16px 20px;
+    }
+
+    .ai-tier-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .ai-tier-price {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    .ai-tier-body {
+      background: var(--white);
+      border-left: 4px solid var(--teal);
+      padding: 20px;
+    }
+
+    .ai-tier-desc {
+      font-size: 13px;
+      color: var(--body);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .ai-tier-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .ai-tier-list li {
+      font-size: 13px;
+      color: var(--body);
+      line-height: 1.5;
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .ai-tier-list li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 7px;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .ai-pilot-note {
+      background: #fff8f7;
+      border: 1px solid #f5ccc6;
+      border-left: 4px solid var(--punch);
+      border-radius: 3px;
+      padding: 14px 20px;
+      font-size: 14px;
+      color: var(--body);
+      line-height: 1.6;
+    }
+
+    .ai-pilot-note strong { color: var(--punch); }
+
     /* ── FOOTER ── */
     footer {
       background: var(--deep);
@@ -718,6 +859,7 @@
     <a href="#hero" class="nav-logo">LUX <span>VIA</span></a>
     <ul class="nav-links">
       <li><a href="#services">Services</a></li>
+      <li><a href="#ai-adoption">AI Adoption</a></li>
       <li><a href="#approach">Approach</a></li>
       <li><a href="#team">Team</a></li>
       <li><a href="#contact">Contact</a></li>
@@ -767,13 +909,14 @@
   <section id="services">
     <div class="section-inner">
       <div class="eyebrow">What we do</div>
-      <h2 class="section-h2">Three service verticals,<br>one trusted partner.</h2>
-      <p class="section-lead">We work across ERP implementation, business advisory, and custom technology - so you can grow without switching partners.</p>
+      <h2 class="section-h2">Four service verticals,<br>one trusted partner.</h2>
+      <p class="section-lead">We work across ERP implementation, business advisory, custom technology, and AI adoption - so you can grow without switching partners.</p>
 
       <div class="tabs">
         <button class="tab-btn active" data-tab="erp">ERP Solutions</button>
         <button class="tab-btn" data-tab="advisory">Advisory</button>
         <button class="tab-btn" data-tab="tech">Custom Technology</button>
+        <button class="tab-btn" data-tab="ai">AI Adoption</button>
       </div>
 
       <div class="tab-panel active" id="tab-erp">
@@ -876,6 +1019,143 @@
             <p>Connect platforms to reduce manual processes and improve data flow across systems</p>
           </div>
         </div>
+      </div>
+
+      <div class="tab-panel" id="tab-ai">
+        <div class="service-text">
+          <h3 class="service-h3">AI Adoption Programme</h3>
+          <p>A structured AI operating layer built on your existing Odoo instance. We connect your live data to a configured AI system so your leadership team can get answers in seconds - not hours.</p>
+          <p>This is not a generic AI tool. It is built around your business, your terminology, and the questions your team asks every week.</p>
+          <ul class="service-list">
+            <li>Live, read-only Odoo API connection</li>
+            <li>Business context layer built from intake sessions</li>
+            <li>Named skills for recurring analyses</li>
+            <li>Role-based AI agents scoped to your operations</li>
+            <li>Debtor management and pipeline review automation</li>
+            <li>Half-day training workshop with leadership team</li>
+            <li>Ongoing monthly programme available</li>
+          </ul>
+        </div>
+        <div class="service-cards">
+          <div class="svc-card">
+            <h4>Layer 01 - Live Data</h4>
+            <p>Secure, read-only API connection to your live Odoo database. Every answer grounded in current data.</p>
+          </div>
+          <div class="svc-card">
+            <h4>Layer 02 - Business Context</h4>
+            <p>A knowledge base built around your operations - terminology, KPIs, team structure, and workflows.</p>
+          </div>
+          <div class="svc-card">
+            <h4>Layer 03 - Named Skills</h4>
+            <p>Recurring analyses encoded as single commands. /pipeline-review, /debtor-run, /stock-report - run against live data in seconds.</p>
+          </div>
+          <div class="svc-card">
+            <h4>Layer 04 - Role-based Agents</h4>
+            <p>Named AI advisors scoped to your business - financial, sales, and operations agents with defined mandates.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI ADOPTION PROGRAMME -->
+  <section id="ai-adoption">
+    <div class="section-inner">
+      <div class="eyebrow">AI Adoption Programme</div>
+      <h2 class="section-h2">Your Odoo data,<br>working for you.</h2>
+      <p class="section-lead">Senior leaders spend hours each week chasing information that already exists in Odoo. We eliminate that - with an AI system configured specifically for your business.</p>
+
+      <div class="ai-layers-grid">
+        <div class="ai-layer-card">
+          <div class="ai-layer-num">Layer 01 - Data</div>
+          <div class="ai-layer-body">
+            <div class="ai-layer-title">Live Odoo connection</div>
+            <div class="ai-layer-desc">A secure, read-only API connection to your live Odoo database. Every answer is grounded in current data - not exports, not cached snapshots.</div>
+          </div>
+        </div>
+        <div class="ai-layer-card">
+          <div class="ai-layer-num">Layer 02 - Context</div>
+          <div class="ai-layer-body">
+            <div class="ai-layer-title">Your business intelligence</div>
+            <div class="ai-layer-desc">A structured knowledge base built around your operations - terminology, workflows, KPIs, team structure. What makes the agent feel specific to you, not generic.</div>
+          </div>
+        </div>
+        <div class="ai-layer-card">
+          <div class="ai-layer-num">Layer 03 - Skills</div>
+          <div class="ai-layer-body">
+            <div class="ai-layer-title">Named, repeatable analyses</div>
+            <div class="ai-layer-desc">Recurring analyses encoded as single commands. Always framed consistently, against live data, in seconds.</div>
+            <div class="ai-layer-tags">
+              <span class="ai-tag">/pipeline-review</span>
+              <span class="ai-tag">/debtor-run</span>
+              <span class="ai-tag">/stock-report</span>
+            </div>
+          </div>
+        </div>
+        <div class="ai-layer-card">
+          <div class="ai-layer-num">Layer 04 - Agents</div>
+          <div class="ai-layer-body">
+            <div class="ai-layer-title">Role-based AI advisors</div>
+            <div class="ai-layer-desc">Named agents scoped to your business - a financial agent, a sales agent, an operations agent - each with a defined mandate and operating cadence.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="eyebrow" style="margin-bottom: 20px;">The Programme</div>
+      <div class="ai-tiers-grid">
+        <div class="ai-tier-card">
+          <div class="ai-tier-head">
+            <div class="ai-tier-name">Foundation Setup</div>
+            <div class="ai-tier-price">R25,000 once-off</div>
+          </div>
+          <div class="ai-tier-body">
+            <div class="ai-tier-desc">Everything needed to get all four layers live and useful from day one.</div>
+            <ul class="ai-tier-list">
+              <li>Secure, live Odoo API connection</li>
+              <li>Business context layer built from intake session</li>
+              <li>8-12 named skills, tested against your live data</li>
+              <li>Up to 2 role-based agents configured</li>
+              <li>Half-day training workshop with leadership team</li>
+              <li>30-day email and WhatsApp support</li>
+            </ul>
+          </div>
+        </div>
+        <div class="ai-tier-card">
+          <div class="ai-tier-head">
+            <div class="ai-tier-name">Enhanced Access</div>
+            <div class="ai-tier-price">R8,000 add-on</div>
+          </div>
+          <div class="ai-tier-body">
+            <div class="ai-tier-desc">Extends the data layer so the agent can take actions in Odoo on your behalf.</div>
+            <ul class="ai-tier-list">
+              <li>Create and update CRM opportunities</li>
+              <li>Log notes on customer records</li>
+              <li>Create draft invoices or sale orders</li>
+              <li>Update project task status</li>
+              <li>Human confirms before any final action</li>
+            </ul>
+          </div>
+        </div>
+        <div class="ai-tier-card">
+          <div class="ai-tier-head">
+            <div class="ai-tier-name">Ongoing Programme</div>
+            <div class="ai-tier-price">R4,500 / month</div>
+          </div>
+          <div class="ai-tier-body">
+            <div class="ai-tier-desc">All four layers kept current as your business evolves.</div>
+            <ul class="ai-tier-list">
+              <li>Monthly context refresh across all operational areas</li>
+              <li>New skills as analytical needs emerge</li>
+              <li>Agent mandate and cadence updates</li>
+              <li>Monthly power session (1 hour)</li>
+              <li>Priority WhatsApp support line</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-pilot-note">
+        <strong>Pilot rate for the first 3 clients:</strong> R18,000 setup + R3,200/month - in exchange for a written case study and willingness to act as a reference client.
       </div>
     </div>
   </section>

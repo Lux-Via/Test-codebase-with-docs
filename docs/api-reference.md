@@ -52,8 +52,4 @@ In-memory product store.
 
 | Method | Parameters | Returns | Notes |
 |---|---|---|---|
-| `generate_report()` | — | str | Renders the inventory as an HTML report using `report.html` as the template structure. |
-
-### report.html
-
-New HTML template for rendering the inventory report. This file includes a table structure for displaying product details such as SKU, name, price, quantity, and status.
+| `ge
